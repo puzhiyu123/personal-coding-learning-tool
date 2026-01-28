@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useThemeContext } from "./ThemeProvider";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,27 +45,36 @@ export default function Header() {
   };
 
   return (
-    <header className={`flex items-center justify-between px-4 md:px-6 py-3 border-b ${
-      isDark
-        ? "bg-sand-950 text-sand-100 border-sand-800"
-        : "bg-white text-sand-900 border-sand-200"
-    }`}>
-      <Link href="/" className="text-lg md:text-xl font-bold tracking-tight">
-        <span className="text-teal-500">Code</span>Forge
+    <header
+      className={cn(
+        "sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 h-14 md:h-16 border-b transition-colors",
+        isDark
+          ? "bg-sand-950/95 backdrop-blur-sm text-sand-100 border-sand-800"
+          : "bg-white/95 backdrop-blur-sm text-sand-900 border-sand-200"
+      )}
+    >
+      {/* Logo */}
+      <Link
+        href="/"
+        className="text-lg md:text-xl font-bold tracking-tight font-serif transition-colors hover:opacity-80"
+      >
+        <span className="text-primary-500">Code</span>
+        <span className={isDark ? "text-sand-100" : "text-sand-900"}>Forge</span>
       </Link>
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-4">
+      <div className="hidden md:flex items-center gap-2">
         <nav className="flex gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={cn(
+                "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isDark
-                  ? "text-sand-300 hover:text-white hover:bg-sand-800"
+                  ? "text-sand-300 hover:text-sand-100 hover:bg-sand-800"
                   : "text-sand-600 hover:text-sand-900 hover:bg-sand-100"
-              }`}
+              )}
             >
               {link.label}
             </Link>
@@ -72,13 +82,17 @@ export default function Header() {
         </nav>
 
         {/* Theme Selector */}
-        <div className="relative">
+        <div className="relative ml-2">
           <button
             onClick={() => setThemeMenuOpen(!themeMenuOpen)}
-            className={`p-2 rounded-lg transition-colors ${
-              isDark ? "hover:bg-sand-800" : "hover:bg-sand-100"
-            }`}
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              isDark
+                ? "text-sand-400 hover:text-sand-100 hover:bg-sand-800"
+                : "text-sand-500 hover:text-sand-900 hover:bg-sand-100"
+            )}
             aria-label="Change theme"
+            aria-expanded={themeMenuOpen}
           >
             <ThemeIcon type={theme === "system" ? "computer" : isDark ? "moon" : "sun"} />
           </button>
@@ -88,11 +102,14 @@ export default function Header() {
                 className="fixed inset-0 z-40"
                 onClick={() => setThemeMenuOpen(false)}
               />
-              <div className={`absolute right-0 mt-2 py-2 w-36 rounded-lg shadow-xl z-50 border ${
-                isDark
-                  ? "bg-sand-900 border-sand-700"
-                  : "bg-white border-sand-200"
-              }`}>
+              <div
+                className={cn(
+                  "absolute right-0 mt-2 py-1 w-36 rounded-lg shadow-warm-lg z-50 border animate-scale-in",
+                  isDark
+                    ? "bg-sand-900 border-sand-700"
+                    : "bg-white border-sand-200"
+                )}
+              >
                 {themeOptions.map((option) => (
                   <button
                     key={option.value}
@@ -100,13 +117,14 @@ export default function Header() {
                       setTheme(option.value);
                       setThemeMenuOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors",
                       theme === option.value
-                        ? "text-teal-400"
+                        ? "text-primary-500"
                         : isDark
                           ? "text-sand-300 hover:bg-sand-800"
                           : "text-sand-600 hover:bg-sand-100"
-                    }`}
+                    )}
                   >
                     <ThemeIcon type={option.icon} />
                     {option.label}
@@ -123,44 +141,36 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
-      <div className="flex md:hidden items-center gap-2">
+      {/* Mobile Menu Buttons */}
+      <div className="flex md:hidden items-center gap-1">
         <button
           onClick={() => setThemeMenuOpen(!themeMenuOpen)}
-          className={`p-2 rounded-lg transition-colors ${
-            isDark ? "hover:bg-sand-800" : "hover:bg-sand-100"
-          }`}
+          className={cn(
+            "p-2 rounded-lg transition-colors",
+            isDark
+              ? "text-sand-400 hover:bg-sand-800"
+              : "text-sand-500 hover:bg-sand-100"
+          )}
           aria-label="Change theme"
         >
           <ThemeIcon type={theme === "system" ? "computer" : isDark ? "moon" : "sun"} />
         </button>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className={`p-2 rounded-lg transition-colors ${
-            isDark ? "hover:bg-sand-800" : "hover:bg-sand-100"
-          }`}
+          className={cn(
+            "p-2 rounded-lg transition-colors",
+            isDark
+              ? "text-sand-400 hover:bg-sand-800"
+              : "text-sand-500 hover:bg-sand-100"
+          )}
           aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileMenuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             )}
           </svg>
         </button>
@@ -168,22 +178,26 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className={`absolute top-14 left-0 right-0 z-50 border-b md:hidden ${
-          isDark
-            ? "bg-sand-950 border-sand-800"
-            : "bg-white border-sand-200"
-        }`}>
-          <nav className="flex flex-col p-4">
+        <div
+          className={cn(
+            "absolute top-14 left-0 right-0 z-50 border-b md:hidden animate-slide-down",
+            isDark
+              ? "bg-sand-950 border-sand-800"
+              : "bg-white border-sand-200"
+          )}
+        >
+          <nav className="flex flex-col p-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg transition-colors ${
+                className={cn(
+                  "px-4 py-3 rounded-lg transition-colors",
                   isDark
-                    ? "text-sand-300 hover:text-white hover:bg-sand-800"
+                    ? "text-sand-300 hover:text-sand-100 hover:bg-sand-800"
                     : "text-sand-600 hover:text-sand-900 hover:bg-sand-100"
-                }`}
+                )}
               >
                 {link.label}
               </Link>
@@ -199,11 +213,14 @@ export default function Header() {
             className="fixed inset-0 z-40 md:hidden"
             onClick={() => setThemeMenuOpen(false)}
           />
-          <div className={`absolute top-14 right-4 z-50 py-2 w-36 rounded-lg shadow-xl border md:hidden ${
-            isDark
-              ? "bg-sand-900 border-sand-700"
-              : "bg-white border-sand-200"
-          }`}>
+          <div
+            className={cn(
+              "absolute top-14 right-4 z-50 py-1 w-36 rounded-lg shadow-warm-lg border md:hidden animate-scale-in",
+              isDark
+                ? "bg-sand-900 border-sand-700"
+                : "bg-white border-sand-200"
+            )}
+          >
             {themeOptions.map((option) => (
               <button
                 key={option.value}
@@ -211,13 +228,14 @@ export default function Header() {
                   setTheme(option.value);
                   setThemeMenuOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors",
                   theme === option.value
-                    ? "text-teal-400"
+                    ? "text-primary-500"
                     : isDark
                       ? "text-sand-300 hover:bg-sand-800"
                       : "text-sand-600 hover:bg-sand-100"
-                }`}
+                )}
               >
                 <ThemeIcon type={option.icon} />
                 {option.label}

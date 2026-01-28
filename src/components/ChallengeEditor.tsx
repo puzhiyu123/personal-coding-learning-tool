@@ -48,15 +48,15 @@ export default function ChallengeEditor({
 
       // Run tests
       const outputStr = logs.join("\n");
-      const results: TestResult[] = challenge.tests.map((test) => {
+      const results: TestResult[] = challenge.tests.map((test, index) => {
         try {
           // eslint-disable-next-line no-new-func
           const testFn = new Function("output", "code", `return ${test.test}`);
           const passed = testFn(outputStr, code);
-          return { name: test.name, passed: Boolean(passed) };
+          return { name: test.name || `Test ${index + 1}`, passed: Boolean(passed) };
         } catch (error) {
           return {
-            name: test.name,
+            name: test.name || `Test ${index + 1}`,
             passed: false,
             error: (error as Error).message,
           };
@@ -73,8 +73,8 @@ export default function ChallengeEditor({
     } catch (error) {
       setOutput([`Error: ${(error as Error).message}`]);
       setTestResults(
-        challenge.tests.map((test) => ({
-          name: test.name,
+        challenge.tests.map((test, index) => ({
+          name: test.name || `Test ${index + 1}`,
           passed: false,
           error: "Code error - fix your code first",
         }))

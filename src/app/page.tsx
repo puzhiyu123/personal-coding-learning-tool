@@ -9,9 +9,9 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-sand-950">
       <Header />
       <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-sand-100 text-center">
-          Welcome to <span className="text-teal-400">Code</span>
-          <span className="text-coral-400">Forge</span>
+        <h1 className="text-4xl md:text-5xl font-bold text-sand-100 text-center font-serif">
+          Welcome to <span className="text-primary-400">Code</span>
+          <span className="text-accent-400">Forge</span>
         </h1>
         <p className="text-sand-400 text-center max-w-md text-lg">
           Learn to code by building real projects. Interactive lessons,
@@ -29,10 +29,10 @@ export default function Home() {
           <Card title="Learn" variant="default" hover>
             <p>Step-by-step lessons designed for beginners.</p>
           </Card>
-          <Card title="Code" variant="teal" hover>
+          <Card title="Code" variant="primary" hover>
             <p>Write and run code directly in your browser.</p>
           </Card>
-          <Card title="Build" variant="coral" hover>
+          <Card title="Build" variant="accent" hover>
             <p>Create real projects to showcase your skills.</p>
           </Card>
         </div>

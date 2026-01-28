@@ -2,23 +2,26 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import type { Lesson } from "@/lib/lessons";
+import type { Lesson, Track } from "@/lib/lessons";
 import { useProgressContext } from "./ProgressProvider";
 import LessonViewer from "./LessonViewer";
 import ChallengeEditor from "./ChallengeEditor";
 import CodeBlock from "./CodeBlock";
+import { cn } from "@/lib/utils";
 
-interface LessonContentProps {
+interface TrackLessonContentProps {
+  track: Track;
   lesson: Lesson;
   nextLesson?: Lesson;
   previousLesson?: Lesson;
 }
 
-export default function LessonContent({
+export default function TrackLessonContent({
+  track,
   lesson,
   nextLesson,
   previousLesson,
-}: LessonContentProps) {
+}: TrackLessonContentProps) {
   const {
     visitLesson,
     completeLesson,
@@ -55,11 +58,11 @@ export default function LessonContent({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "beginner":
-        return "text-teal-400 bg-teal-500/20";
+        return "text-primary-400 bg-primary-500/20";
       case "intermediate":
         return "text-yellow-400 bg-yellow-500/20";
       case "advanced":
-        return "text-coral-400 bg-coral-500/20";
+        return "text-accent-400 bg-accent-500/20";
       default:
         return "text-sand-400 bg-sand-500/20";
     }
@@ -69,22 +72,18 @@ export default function LessonContent({
     <>
       {/* Lesson Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
           <span className="text-sand-500 text-sm">Lesson {lesson.order}</span>
           <span
-            className={`px-2 py-0.5 text-xs rounded-full ${getDifficultyColor(
-              lesson.difficulty
-            )}`}
+            className={cn(
+              "px-2 py-0.5 text-xs rounded-full",
+              getDifficultyColor(lesson.difficulty)
+            )}
           >
             {lesson.difficulty}
           </span>
           <span className="text-sand-500 text-sm flex items-center gap-1">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -95,7 +94,7 @@ export default function LessonContent({
             {lesson.estimatedMinutes} min
           </span>
           {lessonCompleted && (
-            <span className="flex items-center gap-1 text-teal-400 text-sm">
+            <span className="flex items-center gap-1 text-primary-400 text-sm">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -107,7 +106,7 @@ export default function LessonContent({
             </span>
           )}
         </div>
-        <h1 className="text-3xl font-bold text-sand-100">{lesson.title}</h1>
+        <h1 className="text-3xl font-bold text-sand-100 font-serif">{lesson.title}</h1>
         <p className="text-sand-400 mt-2">{lesson.description}</p>
       </div>
 
@@ -119,7 +118,7 @@ export default function LessonContent({
       {/* Code Examples */}
       {lesson.codeExamples.length > 0 && (
         <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-sand-100 mb-4">
+          <h2 className="text-2xl font-semibold text-sand-100 mb-4 font-serif">
             Code Examples
           </h2>
           <div className="space-y-6">
@@ -139,11 +138,11 @@ export default function LessonContent({
       {lesson.challenge && (
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-2xl font-semibold text-sand-100">
-              <span className="text-coral-400">Challenge</span>
+            <h2 className="text-2xl font-semibold text-sand-100 font-serif">
+              <span className="text-accent-400">Challenge</span>
             </h2>
             {challengeCompleted && (
-              <span className="flex items-center gap-1 px-2 py-1 bg-teal-500/20 text-teal-400 rounded-full text-sm">
+              <span className="flex items-center gap-1 px-2 py-1 bg-primary-500/20 text-primary-400 rounded-full text-sm">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
@@ -167,20 +166,10 @@ export default function LessonContent({
         <div className="mb-12">
           <button
             onClick={handleMarkComplete}
-            className="px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2"
+            className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center gap-2"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             Mark Lesson as Complete
           </button>
@@ -191,21 +180,11 @@ export default function LessonContent({
       <div className="flex items-center justify-between pt-8 border-t border-sand-800">
         {previousLesson ? (
           <Link
-            href={`/lessons/${previousLesson.slug}`}
-            className="flex items-center gap-2 text-sand-400 hover:text-teal-400 transition-colors"
+            href={`/lessons/${track.slug}/${previousLesson.slug}`}
+            className="flex items-center gap-2 text-sand-400 hover:text-primary-400 transition-colors"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             <div className="text-left">
               <p className="text-xs text-sand-500">Previous</p>
@@ -218,45 +197,25 @@ export default function LessonContent({
 
         {nextLesson ? (
           <Link
-            href={`/lessons/${nextLesson.slug}`}
-            className="flex items-center gap-2 text-sand-400 hover:text-teal-400 transition-colors"
+            href={`/lessons/${track.slug}/${nextLesson.slug}`}
+            className="flex items-center gap-2 text-sand-400 hover:text-primary-400 transition-colors"
           >
             <div className="text-right">
               <p className="text-xs text-sand-500">Next</p>
               <p className="font-medium">{nextLesson.title}</p>
             </div>
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
         ) : (
           <Link
-            href="/lessons"
-            className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+            href={`/lessons/${track.slug}`}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
-            Back to Lessons
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
+            Back to {track.name}
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </Link>
         )}

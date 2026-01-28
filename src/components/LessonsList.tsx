@@ -100,7 +100,7 @@ export default function LessonsList({ lessons, categories }: LessonsListProps) {
               const challengeCompleted =
                 isLoaded &&
                 lesson.challenge &&
-                isChallengeComplete(lesson.challenge.id);
+                isChallengeComplete(lesson.challenge.id || `${lesson.slug}-challenge`);
 
               return (
                 <Link key={lesson.id} href={`/lessons/${lesson.slug}`}>
