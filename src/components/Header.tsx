@@ -14,6 +14,7 @@ export default function Header() {
     { href: "/", label: "Home" },
     { href: "/editor", label: "Editor" },
     { href: "/lessons", label: "Lessons" },
+    { href: "/projects", label: "Projects" },
   ];
 
   const themeOptions = [

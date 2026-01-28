@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import type { Lesson, Track } from "@/lib/lessons";
+import { getQuizAfterLesson } from "@/lib/quizzes";
 import { useProgressContext } from "./ProgressProvider";
 import LessonViewer from "./LessonViewer";
 import ChallengeEditor from "./ChallengeEditor";
 import CodeBlock from "./CodeBlock";
+import { QuizPrompt } from "./Quiz";
 import { cn } from "@/lib/utils";
 
 interface TrackLessonContentProps {
@@ -175,6 +177,15 @@ export default function TrackLessonContent({
           </button>
         </div>
       )}
+
+      {/* Quiz Prompt */}
+      {(() => {
+        const quiz = getQuizAfterLesson(track.slug, lesson.slug);
+        if (quiz) {
+          return <QuizPrompt quiz={quiz} />;
+        }
+        return null;
+      })()}
 
       {/* Navigation */}
       <div className="flex items-center justify-between pt-8 border-t border-sand-800">

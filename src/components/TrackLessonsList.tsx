@@ -139,7 +139,7 @@ export default function TrackLessonsList({ track, categories }: TrackLessonsList
             <span className={cn("w-2 h-2 rounded-full", colors.checkBg)} />
             {category}
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-6">
             {categoryLessons.map((lesson) => {
               const lessonCompleted = isLoaded && isLessonComplete(lesson.slug);
               const challengeCompleted =
@@ -148,7 +148,7 @@ export default function TrackLessonsList({ track, categories }: TrackLessonsList
                 isChallengeComplete(lesson.challenge.id || `${lesson.slug}-challenge`);
 
               return (
-                <Link key={lesson.id} href={`/lessons/${track.slug}/${lesson.slug}`}>
+                <Link key={lesson.id} href={`/lessons/${track.slug}/${lesson.slug}`} className="block">
                   <div
                     className={cn(
                       "bg-sand-900 border rounded-xl p-4 hover:bg-sand-900/80 transition-all group",

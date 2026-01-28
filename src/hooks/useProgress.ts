@@ -5,6 +5,8 @@ import { useState, useEffect, useCallback } from "react";
 interface Progress {
   completedLessons: string[];
   completedChallenges: string[];
+  completedQuizzes: string[];
+  completedProjects: string[];
   lastVisitedLesson?: string;
   startedAt?: string;
 }
@@ -14,6 +16,8 @@ const STORAGE_KEY = "codeforge-progress";
 const defaultProgress: Progress = {
   completedLessons: [],
   completedChallenges: [],
+  completedQuizzes: [],
+  completedProjects: [],
 };
 
 export function useProgress() {
@@ -79,6 +83,34 @@ export function useProgress() {
     [progress, saveProgress]
   );
 
+  // Mark a quiz as complete
+  const completeQuiz = useCallback(
+    (quizId: string) => {
+      if (!progress.completedQuizzes?.includes(quizId)) {
+        const newProgress = {
+          ...progress,
+          completedQuizzes: [...(progress.completedQuizzes || []), quizId],
+        };
+        saveProgress(newProgress);
+      }
+    },
+    [progress, saveProgress]
+  );
+
+  // Mark a project as complete
+  const completeProject = useCallback(
+    (projectId: string) => {
+      if (!progress.completedProjects?.includes(projectId)) {
+        const newProgress = {
+          ...progress,
+          completedProjects: [...(progress.completedProjects || []), projectId],
+        };
+        saveProgress(newProgress);
+      }
+    },
+    [progress, saveProgress]
+  );
+
   // Track the last visited lesson
   const visitLesson = useCallback(
     (lessonSlug: string) => {
@@ -107,6 +139,22 @@ export function useProgress() {
       return progress.completedChallenges.includes(challengeId);
     },
     [progress.completedChallenges]
+  );
+
+  // Check if a quiz is complete
+  const isQuizComplete = useCallback(
+    (quizId: string) => {
+      return progress.completedQuizzes?.includes(quizId) || false;
+    },
+    [progress.completedQuizzes]
+  );
+
+  // Check if a project is complete
+  const isProjectComplete = useCallback(
+    (projectId: string) => {
+      return progress.completedProjects?.includes(projectId) || false;
+    },
+    [progress.completedProjects]
   );
 
   // Reset all progress
@@ -145,9 +193,13 @@ export function useProgress() {
     isLoaded,
     completeLesson,
     completeChallenge,
+    completeQuiz,
+    completeProject,
     visitLesson,
     isLessonComplete,
     isChallengeComplete,
+    isQuizComplete,
+    isProjectComplete,
     resetProgress,
     getStats,
   };
