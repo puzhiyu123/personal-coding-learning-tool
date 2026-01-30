@@ -64,6 +64,10 @@ interface Progress {
   flashcardProgress: FlashcardProgress[];
   completedArchPrompts: string[];
   viewedComparisons: string[];
+  // Quiz drills
+  completedQuizDrills: string[];
+  quizDrillReviewPool: ReviewItem[];
+  quizPracticeHistory: PracticeSession[];
 }
 
 const STORAGE_KEY = "codeforge-progress";
@@ -88,6 +92,9 @@ const defaultProgress: Progress = {
   flashcardProgress: [],
   completedArchPrompts: [],
   viewedComparisons: [],
+  completedQuizDrills: [],
+  quizDrillReviewPool: [],
+  quizPracticeHistory: [],
 };
 
 function getTodayStr(): string {
@@ -521,6 +528,132 @@ export function useProgress() {
     [progress, saveProgress]
   );
 
+  // Mark a quiz drill as complete
+  const completeQuizDrill = useCallback(
+    (drillId: string) => {
+      if (!progress.completedQuizDrills.includes(drillId)) {
+        const newProgress = {
+          ...progress,
+          completedQuizDrills: [...progress.completedQuizDrills, drillId],
+        };
+        saveProgress(newProgress);
+      }
+    },
+    [progress, saveProgress]
+  );
+
+  const isQuizDrillComplete = useCallback(
+    (drillId: string) => {
+      return progress.completedQuizDrills.includes(drillId);
+    },
+    [progress.completedQuizDrills]
+  );
+
+  // Add or update a quiz review item
+  const addToQuizReviewPool = useCallback(
+    (item: ReviewItem) => {
+      const existing = progress.quizDrillReviewPool.findIndex(
+        (r) => r.challengeId === item.challengeId
+      );
+      let newPool: ReviewItem[];
+      if (existing >= 0) {
+        newPool = progress.quizDrillReviewPool.map((r, i) =>
+          i === existing ? item : r
+        );
+      } else {
+        newPool = [...progress.quizDrillReviewPool, item];
+      }
+      saveProgress({ ...progress, quizDrillReviewPool: newPool });
+    },
+    [progress, saveProgress]
+  );
+
+  // Update a quiz review item after practice
+  const updateQuizReviewItem = useCallback(
+    (challengeId: string, updates: Partial<ReviewItem>) => {
+      const newPool = progress.quizDrillReviewPool.map((r) =>
+        r.challengeId === challengeId ? { ...r, ...updates } : r
+      );
+      saveProgress({ ...progress, quizDrillReviewPool: newPool });
+    },
+    [progress, saveProgress]
+  );
+
+  // Get quiz review items due today or earlier
+  const getQuizReviewsDue = useCallback(() => {
+    const today = getTodayStr();
+    return progress.quizDrillReviewPool.filter(
+      (r) => r.nextReviewDate <= today
+    );
+  }, [progress.quizDrillReviewPool]);
+
+  // Record a quiz practice session and update streak
+  const recordQuizPracticeSession = useCallback(
+    (exerciseIds: string[]) => {
+      const today = getTodayStr();
+      const yesterday = getYesterdayStr();
+
+      const existingToday = progress.quizPracticeHistory.find(
+        (s) => s.date === today
+      );
+
+      let updatedHistory: PracticeSession[];
+      if (existingToday) {
+        const mergedIds = [
+          ...new Set([...existingToday.exerciseIds, ...exerciseIds]),
+        ];
+        updatedHistory = progress.quizPracticeHistory.map((s) =>
+          s.date === today
+            ? {
+                ...s,
+                exercisesCompleted: mergedIds.length,
+                exerciseIds: mergedIds,
+              }
+            : s
+        );
+      } else {
+        updatedHistory = [
+          ...progress.quizPracticeHistory,
+          {
+            date: today,
+            exercisesCompleted: exerciseIds.length,
+            exerciseIds,
+          },
+        ];
+      }
+
+      // Update streak
+      const lastDate = progress.streakData.lastPracticeDate;
+      let newStreak = progress.streakData.currentStreak;
+
+      if (lastDate === today) {
+        // Already practiced today, streak unchanged
+      } else if (lastDate === yesterday) {
+        newStreak += 1;
+      } else {
+        newStreak = 1;
+      }
+
+      const longestStreak = Math.max(
+        progress.streakData.longestStreak,
+        newStreak
+      );
+
+      const newProgress: Progress = {
+        ...progress,
+        quizPracticeHistory: updatedHistory,
+        streakData: {
+          currentStreak: newStreak,
+          longestStreak,
+          lastPracticeDate: today,
+        },
+      };
+
+      saveProgress(newProgress);
+    },
+    [progress, saveProgress]
+  );
+
   // Mark code comparison as viewed
   const markComparisonViewed = useCallback(
     (id: string) => {
@@ -597,5 +730,12 @@ export function useProgress() {
     getFlashcardsDue,
     completeArchPrompt,
     markComparisonViewed,
+    // Quiz drill methods
+    completeQuizDrill,
+    isQuizDrillComplete,
+    addToQuizReviewPool,
+    updateQuizReviewItem,
+    getQuizReviewsDue,
+    recordQuizPracticeSession,
   };
 }

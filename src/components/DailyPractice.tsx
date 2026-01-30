@@ -181,8 +181,18 @@ export default function DailyPractice() {
           <h2 className={cn("text-sm font-medium uppercase tracking-wider", isDark ? "text-sand-500" : "text-sand-400")}>
             Learning Tools
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
+              {
+                href: "/practice/drills/daily",
+                title: "Quick Quiz",
+                description: "10 rapid-fire questions",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                ),
+              },
               {
                 href: "/practice/architect",
                 title: "Build X",

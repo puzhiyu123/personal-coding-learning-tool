@@ -62,6 +62,16 @@ interface ProgressContextType {
   getFlashcardsDue: () => FlashcardProgress[];
   completeArchPrompt: (id: string) => void;
   markComparisonViewed: (id: string) => void;
+  // Quiz drill methods
+  completedQuizDrills: string[];
+  quizDrillReviewPool: ReviewItem[];
+  quizPracticeHistory: PracticeSession[];
+  completeQuizDrill: (drillId: string) => void;
+  isQuizDrillComplete: (drillId: string) => boolean;
+  addToQuizReviewPool: (item: ReviewItem) => void;
+  updateQuizReviewItem: (challengeId: string, updates: Partial<ReviewItem>) => void;
+  getQuizReviewsDue: () => ReviewItem[];
+  recordQuizPracticeSession: (exerciseIds: string[]) => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(
@@ -124,6 +134,16 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         getFlashcardsDue: progressState.getFlashcardsDue,
         completeArchPrompt: progressState.completeArchPrompt,
         markComparisonViewed: progressState.markComparisonViewed,
+        // Quiz drill methods
+        completedQuizDrills: progressState.progress.completedQuizDrills || [],
+        quizDrillReviewPool: progressState.progress.quizDrillReviewPool || [],
+        quizPracticeHistory: progressState.progress.quizPracticeHistory || [],
+        completeQuizDrill: progressState.completeQuizDrill,
+        isQuizDrillComplete: progressState.isQuizDrillComplete,
+        addToQuizReviewPool: progressState.addToQuizReviewPool,
+        updateQuizReviewItem: progressState.updateQuizReviewItem,
+        getQuizReviewsDue: progressState.getQuizReviewsDue,
+        recordQuizPracticeSession: progressState.recordQuizPracticeSession,
       }}
     >
       {children}
