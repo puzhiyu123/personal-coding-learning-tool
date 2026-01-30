@@ -6,7 +6,7 @@ import CodeEditor from "./CodeEditor";
 
 interface ChallengeEditorProps {
   challenge: CodeChallenge;
-  onComplete?: () => void;
+  onComplete?: (quality?: number) => void;
 }
 
 interface TestResult {
@@ -38,52 +38,90 @@ export default function ChallengeEditor({
       logs.push(args.map(String).join(" "));
     };
 
+    // Pre-process: strip ES module syntax so new Function() can parse it
+    const processedCode = code
+      .replace(/export\s+default\s+/g, "")
+      .replace(/^export\s+(?=function|class|const|let|var|async)/gm, "");
+
+    // Check if code contains JSX (can't be executed by new Function)
+    const hasJSX = /<[A-Za-z][A-Za-z0-9]*[\s>\/]/.test(processedCode);
+
+    let runtimeError: string | null = null;
+
     try {
-      // Run the user's code
       // eslint-disable-next-line no-new-func
-      const fn = new Function(code);
+      const fn = new Function(processedCode);
       fn();
-
       setOutput(logs);
+    } catch (error) {
+      runtimeError = (error as Error).message;
+      // Only show error output for non-JSX syntax errors
+      // JSX code is expected to fail in new Function() — tests handle it via code analysis
+      if (!hasJSX) {
+        setOutput([`Error: ${runtimeError}`]);
+      }
+    }
 
-      // Run tests
-      const outputStr = logs.join("\n");
-      const results: TestResult[] = challenge.tests.map((test, index) => {
-        try {
+    // Run tests
+    const outputStr = logs.join("\n");
+    const results: TestResult[] = challenge.tests.map((test, index) => {
+      const testName = test.name || test.description || `Test ${index + 1}`;
+      try {
+        if (test.test) {
+          // Runtime test expression (e.g., `output.includes("3")`)
           // eslint-disable-next-line no-new-func
           const testFn = new Function("output", "code", `return ${test.test}`);
           const passed = testFn(outputStr, code);
-          return { name: test.name || `Test ${index + 1}`, passed: Boolean(passed) };
-        } catch (error) {
-          return {
-            name: test.name || `Test ${index + 1}`,
-            passed: false,
-            error: (error as Error).message,
-          };
+          return { name: testName, passed: Boolean(passed) };
+        } else if (test.input !== undefined && test.expected !== undefined) {
+          // Input/expected test format — try evaluating code + test expression
+          try {
+            // eslint-disable-next-line no-new-func
+            const testFn = new Function(
+              processedCode + `;\nreturn String(${test.input});`
+            );
+            const result = testFn();
+            return { name: testName, passed: result === test.expected };
+          } catch {
+            // Runtime evaluation failed (e.g., JSX in code) — fall back to code analysis
+            if (test.input.startsWith("typeof ")) {
+              const varName = test.input.replace("typeof ", "").trim();
+              const defPattern = new RegExp(
+                `(?:function|async\\s+function|class|const|let|var)\\s+${varName}\\b`
+              );
+              const inferredType = defPattern.test(code) ? "function" : "undefined";
+              return { name: testName, passed: inferredType === test.expected };
+            }
+            return { name: testName, passed: false, error: "Could not evaluate test" };
+          }
         }
-      });
-
-      setTestResults(results);
-
-      // Check if all tests pass
-      const allPassed = results.every((r) => r.passed);
-      if (allPassed && onComplete) {
-        onComplete();
-      }
-    } catch (error) {
-      setOutput([`Error: ${(error as Error).message}`]);
-      setTestResults(
-        challenge.tests.map((test, index) => ({
-          name: test.name || `Test ${index + 1}`,
+        return { name: testName, passed: false };
+      } catch (error) {
+        return {
+          name: testName,
           passed: false,
-          error: "Code error - fix your code first",
-        }))
-      );
-    } finally {
-      console.log = originalLog;
-      setIsRunning(false);
+          error: (error as Error).message,
+        };
+      }
+    });
+
+    setTestResults(results);
+
+    // Check if all tests pass — compute quality score
+    const allPassed = results.every((r) => r.passed);
+    if (allPassed && onComplete) {
+      let quality = 5; // Perfect — no help used
+      if (showSolution) {
+        quality = 1; // Viewed solution
+      } else if (currentHint >= 0) {
+        quality = 3; // Used hints
+      }
+      onComplete(quality);
     }
-  }, [code, challenge.tests, onComplete]);
+
+    console.log = originalLog;
+    setIsRunning(false);
+  }, [code, challenge.tests, onComplete, showSolution, currentHint]);
 
   const nextHint = () => {
     if (currentHint < challenge.hints.length - 1) {

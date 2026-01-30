@@ -352,3 +352,100 @@ code, pre, kbd, samp {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ============================
+   Syntax Highlighting Theme
+   Matches CodeForge sand/teal/coral palette
+   ============================ */
+.hljs {
+  color: var(--color-sand-200);
+  background: var(--color-sand-950);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-deletion {
+  color: var(--color-primary-400);
+}
+
+.hljs-built_in,
+.hljs-type,
+.hljs-selector-id {
+  color: #c084fc; /* purple-400 */
+}
+
+.hljs-string,
+.hljs-selector-class,
+.hljs-addition {
+  color: #4ade80; /* green-400 */
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-selector-attr {
+  color: #fbbf24; /* amber-400 */
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--color-sand-500);
+  font-style: italic;
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.function_ {
+  color: var(--color-accent-400);
+}
+
+.hljs-attr,
+.hljs-attribute {
+  color: var(--color-primary-300);
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: var(--color-accent-300);
+}
+
+.hljs-regexp {
+  color: var(--color-accent-400);
+}
+
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+  color: var(--color-primary-300);
+}
+
+.hljs-params {
+  color: var(--color-sand-300);
+}
+
+.hljs-tag {
+  color: var(--color-sand-300);
+}
+
+.hljs-tag .hljs-name {
+  color: var(--color-accent-400);
+}
+
+.hljs-tag .hljs-attr {
+  color: var(--color-primary-300);
+}
+
+.hljs-punctuation,
+.hljs-operator {
+  color: var(--color-sand-400);
+}
+
+.hljs-property {
+  color: var(--color-primary-300);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}

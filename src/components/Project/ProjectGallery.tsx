@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { projects } from "@/lib/projects";
+import { immersiveProjects } from "@/lib/immersive-projects";
 import { useProgressContext } from "../ProgressProvider";
 import CompanyBadge from "./CompanyBadge";
 import { cn } from "@/lib/utils";
@@ -12,12 +13,50 @@ const difficultyColors = {
   advanced: "text-accent-400 bg-accent-500/20",
 };
 
+interface GalleryProject {
+  id: string;
+  title: string;
+  companyTier: 1 | 2 | 3 | 4;
+  companyName: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  scenario: string;
+  taskCount: number;
+  requiredLessons: string[];
+  isImmersive: boolean;
+}
+
 export default function ProjectGallery() {
   const { isProjectComplete, completedLessons } = useProgressContext();
 
+  // Merge single-file and immersive projects into a unified list
+  const allProjects: GalleryProject[] = [
+    ...projects.map((p) => ({
+      id: p.id,
+      title: p.title,
+      companyTier: p.companyTier,
+      companyName: p.companyName,
+      difficulty: p.difficulty,
+      scenario: p.scenario,
+      taskCount: p.tasks.length,
+      requiredLessons: p.requiredLessons,
+      isImmersive: false,
+    })),
+    ...immersiveProjects.map((p) => ({
+      id: p.id,
+      title: p.title,
+      companyTier: p.companyTier,
+      companyName: p.companyName,
+      difficulty: p.difficulty,
+      scenario: p.scenario,
+      taskCount: p.tasks.length,
+      requiredLessons: [] as string[],
+      isImmersive: true,
+    })),
+  ];
+
   // Group projects by tier
-  const projectsByTier = new Map<number, typeof projects>();
-  for (const project of projects) {
+  const projectsByTier = new Map<number, GalleryProject[]>();
+  for (const project of allProjects) {
     const tier = project.companyTier;
     if (!projectsByTier.has(tier)) {
       projectsByTier.set(tier, []);
@@ -72,12 +111,17 @@ export default function ProjectGallery() {
                   >
                     <div className="p-6">
                       {/* Company Badge */}
-                      <div className="mb-4">
+                      <div className="mb-4 flex items-center justify-between">
                         <CompanyBadge
                           tier={project.companyTier}
                           companyName={project.companyName}
                           size="sm"
                         />
+                        {project.isImmersive && (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                            Multi-File IDE
+                          </span>
+                        )}
                       </div>
 
                       {/* Project Title */}
@@ -101,8 +145,13 @@ export default function ProjectGallery() {
                           {project.difficulty}
                         </span>
                         <span className="text-xs text-sand-500">
-                          {project.tasks.length} {project.tasks.length === 1 ? "task" : "tasks"}
+                          {project.taskCount} {project.taskCount === 1 ? "task" : "tasks"}
                         </span>
+                        {project.isImmersive && (
+                          <span className="text-xs text-sand-500">
+                            React + Vite
+                          </span>
+                        )}
                         {isComplete && (
                           <span className="flex items-center gap-1 text-xs text-teal-400">
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -111,7 +160,7 @@ export default function ProjectGallery() {
                             Completed
                           </span>
                         )}
-                        {!hasRequiredLessons && (
+                        {!project.isImmersive && !hasRequiredLessons && (
                           <span className="flex items-center gap-1 text-xs text-sand-500">
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

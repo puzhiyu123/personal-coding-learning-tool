@@ -282,7 +282,7 @@ console.log("Favorite: " + stats.favoriteType);`,
 }
 
 // Test: Streak of 3 (Jan 26, 27, 28)
-const dates1 = ["2025-01-20", "2025-01-25", "2025-01-26", "2025-01-27", "2025-01-28"];
+const dates1 = ["2025-01-20", "2025-01-23", "2025-01-26", "2025-01-27", "2025-01-28"];
 console.log("Streak 1: " + calculateStreak(dates1));
 
 // Test: Streak of 1 (gap between Jan 25 and Jan 28)
@@ -314,7 +314,7 @@ console.log("Streak 3: " + calculateStreak(dates3));`,
   return streak;
 }
 
-const dates1 = ["2025-01-20", "2025-01-25", "2025-01-26", "2025-01-27", "2025-01-28"];
+const dates1 = ["2025-01-20", "2025-01-23", "2025-01-26", "2025-01-27", "2025-01-28"];
 console.log("Streak 1: " + calculateStreak(dates1));
 
 const dates2 = ["2025-01-20", "2025-01-25", "2025-01-28"];

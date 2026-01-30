@@ -144,26 +144,29 @@ export default function CodeEditor({
   }, [suggestion]);
 
   return (
-    <div ref={containerRef} className="relative h-full">
-      <Editor
-        height="100%"
-        language={language}
-        value={value}
-        theme="vs-dark"
-        onChange={onChange}
-        onMount={handleEditorMount}
-        options={{
-          minimap: { enabled: false },
-          fontSize: 14,
-          lineNumbers: "on",
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-          tabSize: 2,
-          wordWrap: "on",
-          suggestOnTriggerCharacters: true,
-          quickSuggestions: true,
-        }}
-      />
+    <div ref={containerRef} className="relative h-full w-full overflow-hidden">
+      <div className="absolute inset-0">
+        <Editor
+          width="100%"
+          height="100%"
+          language={language}
+          value={value}
+          theme="vs-dark"
+          onChange={onChange}
+          onMount={handleEditorMount}
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: "on",
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            tabSize: 2,
+            wordWrap: "on",
+            suggestOnTriggerCharacters: true,
+            quickSuggestions: true,
+          }}
+        />
+      </div>
 
       {/* AI Suggestion Popup */}
       {(showSuggestion || suggestionLoading) && (

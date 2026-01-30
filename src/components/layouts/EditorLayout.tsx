@@ -13,21 +13,25 @@ interface EditorLayoutProps {
   editor: React.ReactNode;
   output: React.ReactNode;
   terminal?: React.ReactNode;
+  preview?: React.ReactNode;
   chat?: React.ReactNode;
   statusBar?: React.ReactNode;
 }
 
-type OutputTab = "console" | "terminal";
+type OutputTab = "console" | "terminal" | "preview";
 
 export default function EditorLayout({
   sidebar,
   editor,
   output,
   terminal,
+  preview,
   chat,
   statusBar,
 }: EditorLayoutProps) {
-  const [activeOutputTab, setActiveOutputTab] = useState<OutputTab>("console");
+  const [activeOutputTab, setActiveOutputTab] = useState<OutputTab>(
+    preview ? "preview" : "console"
+  );
   const [showChat, setShowChat] = useState(false);
 
   return (
@@ -52,6 +56,19 @@ export default function EditorLayout({
             <div className="flex flex-col h-full bg-sand-900">
               {/* Tab header */}
               <div className="flex border-b border-sand-800">
+                {preview && (
+                  <button
+                    onClick={() => setActiveOutputTab("preview")}
+                    className={cn(
+                      "px-4 py-2 text-sm font-medium transition-colors",
+                      activeOutputTab === "preview"
+                        ? "text-primary-400 border-b-2 border-primary-500"
+                        : "text-sand-500 hover:text-sand-300"
+                    )}
+                  >
+                    Preview
+                  </button>
+                )}
                 <button
                   onClick={() => setActiveOutputTab("console")}
                   className={cn(
@@ -96,7 +113,11 @@ export default function EditorLayout({
               </div>
               {/* Tab content */}
               <div className="flex-1 min-h-0 overflow-auto scrollbar-hide">
-                {activeOutputTab === "console" ? output : terminal}
+                {activeOutputTab === "preview"
+                  ? preview
+                  : activeOutputTab === "console"
+                  ? output
+                  : terminal}
               </div>
             </div>
           </Panel>

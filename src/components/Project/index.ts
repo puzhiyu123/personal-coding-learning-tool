@@ -4,3 +4,8 @@ export { default as ProjectContainer } from "./ProjectContainer";
 export { default as ProjectEditor } from "./ProjectEditor";
 export { default as ProjectGallery } from "./ProjectGallery";
 export { default as ProjectSlackMessage } from "./ProjectSlackMessage";
+export { default as ImmersiveWorkspace } from "./ImmersiveWorkspace";
+export { default as ImmersiveFileTree } from "./ImmersiveFileTree";
+export { default as ImmersiveBriefing } from "./ImmersiveBriefing";
+export { default as LivePreview } from "./LivePreview";
+export { default as TaskPanel } from "./TaskPanel";

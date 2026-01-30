@@ -3,39 +3,55 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { projects, getProjectById } from "@/lib/projects";
+import {
+  immersiveProjects,
+  getImmersiveProjectById,
+} from "@/lib/immersive-projects";
 import { ProjectContainer } from "@/components/Project";
+import ImmersiveBriefing from "@/components/Project/ImmersiveBriefing";
 
 interface ProjectPageProps {
   params: Promise<{ projectId: string }>;
 }
 
 export function generateStaticParams() {
-  return projects.map((project) => ({
-    projectId: project.id,
-  }));
+  return [
+    ...projects.map((project) => ({
+      projectId: project.id,
+    })),
+    ...immersiveProjects.map((project) => ({
+      projectId: project.id,
+    })),
+  ];
 }
 
 export async function generateMetadata({ params }: ProjectPageProps) {
   const { projectId } = await params;
   const project = getProjectById(projectId);
+  const immersiveProject = getImmersiveProjectById(projectId);
 
-  if (!project) {
+  const found = project || immersiveProject;
+
+  if (!found) {
     return { title: "Project Not Found" };
   }
 
   return {
-    title: `${project.title} | ${project.companyName} | CodeForge`,
-    description: project.scenario,
+    title: `${found.title} | ${found.companyName} | CodeForge`,
+    description: found.scenario,
   };
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { projectId } = await params;
   const project = getProjectById(projectId);
+  const immersiveProject = getImmersiveProjectById(projectId);
 
-  if (!project) {
+  if (!project && !immersiveProject) {
     notFound();
   }
+
+  const found = (project || immersiveProject)!;
 
   return (
     <div className="flex min-h-screen flex-col bg-sand-950">
@@ -64,11 +80,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </li>
-            <li className="text-sand-300">{project.title}</li>
+            <li className="text-sand-300">{found.title}</li>
           </ol>
         </nav>
 
-        <ProjectContainer project={project} />
+        {immersiveProject ? (
+          <ImmersiveBriefing project={immersiveProject} />
+        ) : (
+          <ProjectContainer project={project!} />
+        )}
       </main>
       <Footer />
     </div>
